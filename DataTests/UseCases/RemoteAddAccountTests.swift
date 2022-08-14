@@ -13,13 +13,13 @@ class RemoteAddAccountTests: XCTestCase {
     func test_add_should_call_httpClient_with_correct_url() {
         let (sut, httpClientSpy) = makeSut();
         let url = URL(string: "http://any-url.com");
-        sut.add(addAccountModel: makeAccountModel()) { _ in };
+        sut.add(addAccountModel: makeAddAccountModel()) { _ in };
         XCTAssertEqual(httpClientSpy.urls, [url]);
     }
     
     func test_add_should_call_httpClient_with_correct_data() {
         let (sut, httpClientSpy) = makeSut();
-        let addAccountModel = makeAccountModel();
+        let addAccountModel = makeAddAccountModel();
         sut.add(addAccountModel: addAccountModel) { _ in };
         XCTAssertEqual(httpClientSpy.data, addAccountModel.toData());
     }
@@ -27,10 +27,10 @@ class RemoteAddAccountTests: XCTestCase {
     func test_add_should_complete_with_error_if_client_completes_with_error() {
         let (sut, httpClientSpy) = makeSut();
         let exp = expectation(description: "waiting");
-        sut.add(addAccountModel: makeAccountModel()) { result in
+        sut.add(addAccountModel: makeAddAccountModel()) { result in
             switch result {
                 case.failure(let error): XCTAssertEqual(error, .unexpected);
-                case.success: XCTFail("Expected error receiv \(result) insted")
+                case.success: XCTFail("Expected error received \(result) insted")
             }
             
             exp.fulfill();
@@ -43,7 +43,7 @@ class RemoteAddAccountTests: XCTestCase {
 // Helpers
 extension RemoteAddAccountTests {
     // Factory Design Pattern
-    func makeAccountModel() -> AddAccountModel {
+    func makeAddAccountModel() -> AddAccountModel {
         return AddAccountModel(name: "any_name", email: "any_email@emai.com", password: "any_password", passwordConfirmation: "any_password");
     }
     
