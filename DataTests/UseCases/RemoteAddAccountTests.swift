@@ -38,13 +38,33 @@ class RemoteAddAccountTests: XCTestCase {
         httpClientSpy.completeWithError(.noConnectivity);
         wait(for: [exp], timeout: 1);
     }
+    
+    func test_add_should_complete_with_account_if_client_completes_with_data() {
+        let (sut, httpClientSpy) = makeSut();
+        let exp = expectation(description: "waiting");
+        let expectedAccount = makeAccountModel();
+        sut.add(addAccountModel: makeAddAccountModel()) { result in
+            switch result {
+                case.failure: XCTFail("Expected success received \(result) insted")
+                case.success(let receivedAccount): XCTAssertEqual(receivedAccount, expectedAccount)
+            }
+
+            exp.fulfill();
+        };
+        httpClientSpy.completeWithData(expectedAccount.toData()!);
+        wait(for: [exp], timeout: 1);
+    }
 }
 
-// Helpers
+// HelpersU
 extension RemoteAddAccountTests {
     // Factory Design Pattern
     func makeAddAccountModel() -> AddAccountModel {
         return AddAccountModel(name: "any_name", email: "any_email@emai.com", password: "any_password", passwordConfirmation: "any_password");
+    }
+    
+    func makeAccountModel() -> AccountModel {
+        return AccountModel(id: "any", name: "any_name", email: "any_email@emai.com", password: "any_password");
     }
     
     func makeSut(url: URL = URL(string: "http://any-url.com")!) -> (sut: RemoteAddAccount, httpClientSpy: HttpClientSpy) {
@@ -67,6 +87,10 @@ extension RemoteAddAccountTests {
         
         func completeWithError(_ error: HttpError) {
             completion?(.failure(error));
+        }
+        
+        func completeWithData(_ data: Data) {
+            completion?(.success(data));
         }
     }
 }
