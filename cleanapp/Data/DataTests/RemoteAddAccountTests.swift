@@ -30,9 +30,7 @@ final class RemoteAddAccountTests: XCTestCase {
         let url = URL(string: "https://any-url.com")!;
         let httpClientSpy = HttpClientSpy()
         let sut = RemoteAddAccount(url: url, httpClient: httpClientSpy);
-        
         sut.add();
-        
         XCTAssertEqual(httpClientSpy.url, url);
     }
 }
