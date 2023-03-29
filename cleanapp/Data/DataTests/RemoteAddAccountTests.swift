@@ -32,8 +32,7 @@ final class RemoteAddAccountTests: XCTestCase {
         let url = URL(string: "https://any-url.com")!;
         let httpClientSpy = HttpClientSpy()
         let sut = RemoteAddAccount(url: url, httpClient: httpClientSpy);
-        let addAccountModel = AddAccountModel(name: "any_name", email: "any_email@email.com", password: "any_password", passwordConfirmation: "any_password");
-        sut.add(addAccountModel: addAccountModel);
+        sut.add(addAccountModel:  makeAccountModel());
         XCTAssertEqual(httpClientSpy.url, url);
     }
     
@@ -41,7 +40,7 @@ final class RemoteAddAccountTests: XCTestCase {
         let url = URL(string: "https://any-url.com")!;
         let httpClientSpy = HttpClientSpy()
         let sut = RemoteAddAccount(url: url, httpClient: httpClientSpy);
-        let addAccountModel = AddAccountModel(name: "any_name", email: "any_email@email.com", password: "any_password", passwordConfirmation: "any_password");
+        let addAccountModel = makeAccountModel()
         sut.add(addAccountModel: addAccountModel);
         let data = try? JSONEncoder().encode(addAccountModel);
         XCTAssertEqual(httpClientSpy.data, data);
@@ -59,5 +58,10 @@ extension RemoteAddAccountTests {
             self.url = url;
             self.data = data;
         }
+    }
+    
+    // Factories
+    func makeAccountModel() -> AddAccountModel {
+        return AddAccountModel(name: "any_name", email: "any_email@email.com", password: "any_password", passwordConfirmation: "any_password");
     }
 }
