@@ -29,8 +29,8 @@ final class RemoteAddAccountTests: XCTestCase {
         let exp = expectation(description: "waiting")
         sut.add(addAccountModel: makeAddAccountModel()) { result in
             switch result {
-                case .failure(let error): XCTAssertEqual(error, .unexpected);
-                case .success: XCTFail("Expected error received \(result) instead")
+            case .failure(let error): XCTAssertEqual(error, .unexpected);
+            case .success: XCTFail("Expected error received \(result) instead")
             }
             exp.fulfill()
         };
@@ -38,20 +38,37 @@ final class RemoteAddAccountTests: XCTestCase {
         wait(for: [exp], timeout: 1)
     }
     
-    func test_add_should_complete_with_account_if_client_completes_with_data() {
+    func test_add_should_complete_with_account_if_client_completes_with_valid_data() {
         let (sut, httpClientSpy) = makeSut();
         let exp = expectation(description: "waiting");
         let expectedAccount = makeAccountModel();
         
         sut.add(addAccountModel: makeAddAccountModel()) { result in
             switch result {
-                case .failure: XCTFail("Expected success received \(result) instead")
-                case .success(let receivedAccount): XCTAssertEqual(receivedAccount, expectedAccount)
+            case .failure: XCTFail("Expected success received \(result) instead")
+            case .success(let receivedAccount): XCTAssertEqual(receivedAccount, expectedAccount)
             }
             exp.fulfill()
         };
         
         httpClientSpy.completeWithData(expectedAccount.toData()!);
+        wait(for: [exp], timeout: 1)
+    }
+    
+    func test_add_should_complete_with_error_if_client_completes_with_invalid_data() {
+        let (sut, httpClientSpy) = makeSut();
+        let exp = expectation(description: "waiting");
+        let expectedAccount = makeAccountModel();
+        
+        sut.add(addAccountModel: makeAddAccountModel()) { result in
+            switch result {
+            case .failure(let error): XCTAssertEqual(error, .unexpected);
+            case .success: XCTFail("Expected error received \(result) instead")
+            }
+            exp.fulfill()
+        };
+        
+        httpClientSpy.completeWithData(Data("invalid_data".utf8));
         wait(for: [exp], timeout: 1)
     }
 }
